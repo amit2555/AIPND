@@ -56,7 +56,15 @@ def main():
     model.class_to_idx = image_datasets['train'].class_to_idx
     model_name = "checkpoint-part-2.pth"
     save_dir = args.save_dir or ""
-    torch.save(model, save_dir + "checkpoint-part-2.pth")
+    checkpoint = {"arch": args.arch, 
+                  "classifier": model.classifier,
+                  "optimizer": optimizer,
+                  "state_dict": model.state_dict(),
+                  "class_to_idx": model.class_to_idx,
+                  "hidden_units": args.hidden_units,
+                  "learning_rate": args.learning_rate,
+                  "epochs": args.epochs}
+    torch.save(checkpoint, save_dir + "checkpoint-part-2.pth")
     
     
 if __name__ == "__main__":

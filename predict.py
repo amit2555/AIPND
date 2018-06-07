@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-from torchvision import transforms
+from torchvision import transforms, models
 import argparse
 import json
 from PIL import Image
@@ -31,8 +31,15 @@ def parse_args():
     parser.add_argument('--gpu', action="store_true", default=False)
     return parser.parse_args()
 
-def load_checkpoint(checkpoint):
-    return torch.load(checkpoint)
+def load_checkpoint(filepath):
+    checkpoint = torch.load(filepath)
+    model = getattr(models, checkpoint['arch'])(pretrained=True)
+    for param in model.parameters():
+        param.requires_grad = False
+    model.classifier = checkpoint['classifier']
+    model.state_dict = checkpoint['state_dict']
+    model.class_to_idx = checkpoint['class_to_idx']
+    return model
     
 def predict(image_path, model, device, topk=1):
     processed_image = process_image(image_path)
@@ -43,8 +50,6 @@ def predict(image_path, model, device, topk=1):
     return ([prob.item() for prob in probs[0].data], 
             [idx_to_class[ix.item()] for ix in indices[0].data])
 
-#m = load_checkpoint("checkpoint.pth")
-#predict("flowers/train/1/image_06734.jpg", m)
     
 def main():
     args = parse_args()
