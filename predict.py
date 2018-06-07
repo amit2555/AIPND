@@ -36,7 +36,10 @@ def load_checkpoint(filepath):
     model = getattr(models, checkpoint['arch'])(pretrained=True)
     for param in model.parameters():
         param.requires_grad = False
-    model.classifier = checkpoint['classifier']
+    if checkpoint["arch"] == "vgg16":
+        model.classifier = checkpoint['classifier']
+    else:
+        model.fc = checkpoint["fc"]
     model.state_dict = checkpoint['state_dict']
     model.class_to_idx = checkpoint['class_to_idx']
     return model

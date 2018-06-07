@@ -38,8 +38,8 @@ def load_datasets(data_dir):
                       for x in ['train', 'valid', 'test']}
     return image_datasets
 
-def train_model(model, criterion, optimizer, scheduler, image_datasets, num_epochs=25):
-    device = device_type()
+def train_model(model, criterion, optimizer, scheduler, image_datasets, gpu, num_epochs=25):
+    device = device_type(gpu)
     dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x],
                                                   batch_size=64,
                                                   shuffle=True)
@@ -87,7 +87,6 @@ def train_model(model, criterion, optimizer, scheduler, image_datasets, num_epoc
 
             epoch_loss = running_loss / dataset_sizes[phase]
             epoch_acc = running_corrects.double() / dataset_sizes[phase]
-            #print("Epoch: {}, Epoch Loss: {}".format(epoch, epoch_loss))                
             print('Phase: {} Loss: {:.4f} Acc: {:.4f}'.format(
                   phase, epoch_loss, epoch_acc))
 
